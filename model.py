@@ -1,3 +1,6 @@
+import xlsxwriter
+
+
 class Model:
     def __init__(self):
         self.info = {}
@@ -10,7 +13,7 @@ class Model:
         self.file = open(file_path, "r")
         for index, line in enumerate(self.file):
             self.fields = line.split(";")
-            if index <= 28:
+            if index <= 27:
                 self.info[self.fields[0]] = self.fields[1] + self.fields[2]
             else:
                 self.x.append((float(self.fields[0].replace(',', '.'))))
@@ -20,3 +23,19 @@ class Model:
                         * (10 ** (-9)) * x) for x in self.x]
         for i in range(0, len(self.y)):
             self.y_current = [self.k[c] + self.y[c] for c in range(len(self.y))]
+
+    def export_file(self, x, y, y_current, info, file_path):
+        if not file_path:
+            print("error")
+        else:
+            self.workbook = xlsxwriter.Workbook(file_path)
+            self.worksheet = self.workbook.add_worksheet("Data")
+            print(x)
+            self.worksheet.write("A1", "f [Hz]")
+            self.worksheet.write("B1", "U [dBuV]")
+            self.worksheet.write("C1", "I [dBuA]")
+            for i, num in enumerate(x):
+                self.worksheet.write('A' + str(i+2), x[i])
+                self.worksheet.write('B' + str(i+2), y[i])
+                self.worksheet.write('C' + str(i+2), y_current[i])
+            self.workbook.close()
